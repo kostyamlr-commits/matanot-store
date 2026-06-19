@@ -1,6 +1,5 @@
 {
   "crons": [
-    { "path": "/api/keep-alive", "schedule": "0 */12 * * *" },
     { "path": "/api/fetch-products", "schedule": "0 8 * * *" }
   ]
 }
