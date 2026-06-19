@@ -9,4 +9,3 @@ h2{font-size:clamp(20px,3vw,28px);font-weight:800;margin:0}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 *::-webkit-scrollbar{display:none}
 *{scrollbar-width:none}
-@media(max-width:640px){body{font-size:15px}}
