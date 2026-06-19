@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Header from '../components/Header'
 import ProductGrid from '../components/ProductGrid'
 import Footer from '../components/Footer'
+import { supabase } from '../lib/supabase'
 
 export default function Home({ initialProducts, total }) {
   return (
@@ -32,14 +33,24 @@ export default function Home({ initialProducts, total }) {
   )
 }
 
+// קוראים ישירות מ-Supabase בזמן build/revalidate - בלי תלות ב-URL חיצוני
 export async function getStaticProps() {
   try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://matanot-store.vercel.app'
-    const r = await fetch(`${base}/api/products?page=1&limit=6`)
-    if (!r.ok) throw new Error('fetch failed')
-    const d = await r.json()
-    return { props: { initialProducts: d.products||[], total: d.total||0 }, revalidate: 3600 }
-  } catch {
-    return { props: { initialProducts: [], total: 0 }, revalidate: 60 }
+    const { data, error, count } = await supabase
+      .from('products')
+      .select('*', { count: 'exact' })
+      .eq('active', true)
+      .order('orders', { ascending: false })
+      .range(0, 5)
+
+    if (error) throw error
+
+    return {
+      props: { initialProducts: data || [], total: count || 0 },
+      revalidate: 60, // מתעדכן כל דקה - מהיר יותר לבדיקה
+    }
+  } catch (e) {
+    console.error('getStaticProps error:', e.message)
+    return { props: { initialProducts: [], total: 0 }, revalidate: 30 }
   }
 }
