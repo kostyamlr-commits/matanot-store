@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, featured=false }) {
   const [saved, setSaved] = useState(false)
   const [imgErr, setImgErr] = useState(false)
+  const [hover, setHover] = useState(false)
 
   useEffect(() => {
     try {
@@ -34,39 +35,96 @@ export default function ProductCard({ product }) {
     }
   }
 
+  const stars = Math.round(product.rating || 4)
+  const orders = product.orders || 0
+  const isHot = orders > 5000
+
   return (
-    <div style={{background:'#111',border:'1px solid #222',borderRadius:12,overflow:'hidden',display:'flex',flexDirection:'column',transition:'border-color 0.2s,transform 0.2s',position:'relative'}}
-      onMouseEnter={e=>{e.currentTarget.style.borderColor='#ff2d78';e.currentTarget.style.transform='translateY(-2px)'}}
-      onMouseLeave={e=>{e.currentTarget.style.borderColor='#222';e.currentTarget.style.transform='none'}}
+    <article
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: '#16161a',
+        borderRadius: 18,
+        overflow: 'visible',
+        position: 'relative',
+        transition: 'transform 0.25s cubic-bezier(.2,.8,.2,1)',
+        transform: hover ? 'translateY(-6px) rotate(-0.3deg)' : 'none',
+      }}
     >
-      <button onClick={toggleWishlist} style={{position:'absolute',top:8,right:8,zIndex:3,background:'rgba(0,0,0,0.6)',border:'none',borderRadius:'50%',width:32,height:32,cursor:'pointer',fontSize:16,display:'flex',alignItems:'center',justifyContent:'center'}}>
+      {/* תווית "פתק" באלכסון - חתימת עיצוב */}
+      {isHot && (
+        <div style={{
+          position: 'absolute', top: -10, right: -8, zIndex: 4,
+          background: '#ffd23f', color: '#1a1300',
+          fontSize: 11, fontWeight: 800, padding: '4px 10px',
+          borderRadius: '6px 6px 6px 2px',
+          transform: 'rotate(4deg)',
+          boxShadow: '0 2px 0 rgba(0,0,0,0.25)',
+        }}>🔥 להיט</div>
+      )}
+
+      {/* כפתור שמירה */}
+      <button onClick={toggleWishlist} aria-label="שמור למועדפים"
+        style={{
+          position: 'absolute', top: 10, left: 10, zIndex: 3,
+          background: 'rgba(12,12,14,0.7)', backdropFilter: 'blur(4px)',
+          border: 'none', borderRadius: '50%', width: 34, height: 34,
+          cursor: 'pointer', fontSize: 16, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+        }}>
         {saved ? '❤️' : '🤍'}
       </button>
-      <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer sponsored" style={{display:'block',width:'100%',aspectRatio:'1/1',background:'#1a1a1a',overflow:'hidden'}}>
+
+      {/* תמונה */}
+      <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer sponsored"
+        style={{ display: 'block', width: '100%', aspectRatio: '1/1', background: '#0c0c0e', overflow: 'hidden', borderRadius: '18px 18px 0 0' }}>
         {!imgErr && product.image
-          ? <img src={product.image} alt={product.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.3s'}} onError={()=>setImgErr(true)} onMouseEnter={e=>e.target.style.transform='scale(1.05)'} onMouseLeave={e=>e.target.style.transform='scale(1)'} loading="lazy"/>
-          : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:48}}>🎁</div>
+          ? <img src={product.image} alt={product.title}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s', transform: hover ? 'scale(1.06)' : 'scale(1)' }}
+              onError={() => setImgErr(true)} loading="lazy" />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 52 }}>🎁</div>
         }
       </a>
-      <div style={{padding:'14px 14px 16px',display:'flex',flexDirection:'column',gap:8,flexGrow:1}}>
-        <p style={{margin:0,fontSize:15,fontWeight:700,color:'#fff',lineHeight:1.4,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+
+      {/* תוכן */}
+      <div style={{ padding: '14px 16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <p style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: '#f4f4f5', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 42 }}>
           {product.title}
         </p>
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          {[1,2,3,4,5].map(i=><span key={i} style={{fontSize:13,color:i<=(Math.round(product.rating||0))?'#ffe600':'#333'}}>★</span>)}
-          <span style={{fontSize:12,color:'#666'}}>{(product.orders||0).toLocaleString()} הזמנות</span>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: 1 }}>
+            {[1,2,3,4,5].map(i => (
+              <span key={i} style={{ fontSize: 13, color: i <= stars ? '#ffd23f' : '#3a3a40' }}>★</span>
+            ))}
+          </div>
+          <span style={{ fontSize: 11.5, color: '#7a7a82', fontWeight: 600 }}>
+            {orders >= 1000 ? `${Math.round(orders/1000*10)/10}K` : orders} הזמנות
+          </span>
         </div>
-        <div style={{display:'flex',flexDirection:'column',gap:6,marginTop:'auto'}}>
-          <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer sponsored"
-            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,background:'#e62200',color:'#fff',fontSize:14,fontWeight:700,padding:'11px 0',borderRadius:8,transition:'background 0.2s'}}
-            onMouseEnter={e=>e.currentTarget.style.background='#c41d00'}
-            onMouseLeave={e=>e.currentTarget.style.background='#e62200'}
-          >🛒 לרכישה באליאקספרס</a>
-          <button onClick={shareWA} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,background:'#1a2e22',color:'#25d366',fontSize:13,fontWeight:600,padding:'9px 0',borderRadius:8,border:'1px solid #25d36633',cursor:'pointer',width:'100%',fontFamily:'Heebo,sans-serif'}}>
-            📲 שלח לחבר
-          </button>
-        </div>
+
+        <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer sponsored"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            background: '#ff3b6b', color: '#1a0008', fontSize: 14, fontWeight: 800,
+            padding: '12px 0', borderRadius: 12, transition: 'background 0.2s, transform 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#ff5980'; e.currentTarget.style.transform = 'scale(1.02)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = '#ff3b6b'; e.currentTarget.style.transform = 'none' }}
+        >
+          לרכישה ←
+        </a>
+        <button onClick={shareWA}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            background: 'transparent', color: '#25d366', fontSize: 12.5, fontWeight: 700,
+            padding: '8px 0', borderRadius: 10, border: '1px solid #25d36640', cursor: 'pointer',
+            width: '100%', fontFamily: 'Heebo,sans-serif',
+          }}>
+          שתף עם חבר 📲
+        </button>
       </div>
-    </div>
+    </article>
   )
 }
