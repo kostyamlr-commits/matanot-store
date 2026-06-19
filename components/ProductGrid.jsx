@@ -3,7 +3,7 @@ import ProductCard from './ProductCard'
 
 function Skeleton() {
   return (
-    <div style={{background:'#16161a',borderRadius:18,overflow:'hidden'}}>
+    <div style={{background:'rgba(255,255,255,0.03)',backdropFilter:'blur(16px)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'1.5rem',overflow:'hidden'}}>
       <div style={{width:'100%',aspectRatio:'1/1',background:'linear-gradient(90deg,#1c1c20 25%,#26262c 50%,#1c1c20 75%)',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/>
       <div style={{padding:'14px 16px 18px',display:'flex',flexDirection:'column',gap:10}}>
         <div style={{height:32,borderRadius:8,background:'linear-gradient(90deg,#1c1c20 25%,#26262c 50%,#1c1c20 75%)',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/>
@@ -14,11 +14,7 @@ function Skeleton() {
   )
 }
 
-const LABELS = {
-  forhim:'👨 לו', forher:'👩 לה', kids:'👧 לילדים', pet:'🐾 לחיות',
-  prank:'😈 פראנקים', gadget:'🔧 גאדג׳טים', home:'🏠 בית',
-  party:'🎉 מסיבה', cheap:'💰 עד ₪50', new:'🆕 חדש', funny:'😂 מצחיקים',
-}
+const LABELS = { wtf:'WTF?!', gadget:'Gadget Mania', funny:'Funny/Gag', home:'Home Oddities' }
 
 export default function ProductGrid({ initialProducts=[], total=0 }) {
   const [products, setProducts] = useState(initialProducts)
@@ -51,7 +47,7 @@ export default function ProductGrid({ initialProducts=[], total=0 }) {
     if (busy.current) return
     busy.current = true; setLoading(true)
     try {
-      let url = `/api/products?page=${p}&limit=6`
+      let url = `/api/products?page=${p}&limit=8`
       if (q) url += `&q=${encodeURIComponent(q)}`
       else if (cat) url += `&cat=${cat}`
       const r = await fetch(url)
@@ -73,7 +69,7 @@ export default function ProductGrid({ initialProducts=[], total=0 }) {
       <p style={{color:'#5a5a62',fontSize:14,margin:'0 0 28px'}}>דירוג גבוה • אלפי הזמנות • מתעדכן אוטומטית</p>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(250px,1fr))',gap:20}}>
         {products.map(p=><ProductCard key={p.id} product={p}/>)}
-        {loading && products.length===0 && [1,2,3,4,5,6].map(i=><Skeleton key={i}/>)}
+        {loading && products.length===0 && [1,2,3,4,5,6,7,8].map(i=><Skeleton key={i}/>)}
       </div>
       {products.length===0 && !loading && (
         <div style={{textAlign:'center',padding:'80px 20px',color:'#5a5a62'}}>
@@ -84,7 +80,7 @@ export default function ProductGrid({ initialProducts=[], total=0 }) {
       )}
       {loading && products.length>0 && (
         <div style={{textAlign:'center',padding:'32px 0'}}>
-          <div style={{display:'inline-block',width:30,height:30,border:'3px solid #1c1c20',borderTop:'3px solid #ff3b6b',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/>
+          <div style={{display:'inline-block',width:30,height:30,border:'3px solid rgba(255,255,255,0.1)',borderTop:'3px solid #ff3b6b',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/>
         </div>
       )}
       {!hasMore && !loading && products.length>0 && <p style={{textAlign:'center',color:'#3a3a40',padding:'32px 0',fontSize:14,fontWeight:600}}>🎁 ראית הכל!</p>}
