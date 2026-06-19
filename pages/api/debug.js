@@ -19,13 +19,16 @@ export default async function handler(req, res) {
     sign_method: 'md5',
     timestamp: ts,
     v: '2.0',
-    keywords: 'funny gift',
+    keywords: 'resin desk ornament',
     page_no: '1',
-    page_size: '10',
+    page_size: '5',
     sort: 'LAST_VOLUME_DESC',
-    tracking_id: process.env.ALIEXPRESS_TRACKING_ID || 'default',
+    tracking_id: 'default',
     target_currency: 'ILS',
     target_language: 'EN',
+    min_sale_price: '6',
+    max_sale_price: '45',
+    fields: 'product_id,product_title,product_main_image_url,product_small_image_urls,product_video_url,evaluate_rate,lastest_volume,promotion_link,product_detail_url,second_level_category_name,target_sale_price,sale_price',
   }
 
   const s = Object.keys(params).sort().map(k=>`${k}${params[k]}`).join('')
@@ -37,12 +40,14 @@ export default async function handler(req, res) {
     body: new URLSearchParams(params).toString(),
   })
 
-  const text = await r.text()
-  
+  const data = JSON.parse(await r.text())
+  const resp = data?.aliexpress_affiliate_product_query_response?.resp_result
+  const products = resp?.result?.products?.product || []
+
   return res.status(200).json({
-    timestamp_sent: ts,
-    app_key_used: APP_KEY,
-    has_secret: !!process.env.ALIEXPRESS_APP_SECRET,
-    raw_response: text.slice(0, 1500),
+    resp_code: resp?.resp_code,
+    resp_msg: resp?.resp_msg,
+    count: products.length,
+    sample_raw: products.slice(0,2),
   })
 }
