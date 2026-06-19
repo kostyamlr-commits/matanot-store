@@ -1,5 +1,0 @@
-{
-  "crons": [
-    { "path": "/api/fetch-products", "schedule": "0 8 * * *" }
-  ]
-}
