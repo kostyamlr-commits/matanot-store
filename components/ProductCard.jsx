@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function ProductCard({ product, featured=false }) {
+export default function ProductCard({ product }) {
   const [saved, setSaved] = useState(false)
   const [imgErr, setImgErr] = useState(false)
   const [hover, setHover] = useState(false)
@@ -37,48 +37,37 @@ export default function ProductCard({ product, featured=false }) {
 
   const stars = Math.round(product.rating || 4)
   const orders = product.orders || 0
-  const isHot = orders > 5000
 
   return (
     <article
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: '#16161a',
-        borderRadius: 18,
-        overflow: 'visible',
+        background: 'rgba(255,255,255,0.03)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: hover ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '1.5rem',
+        overflow: 'hidden',
         position: 'relative',
-        transition: 'transform 0.25s cubic-bezier(.2,.8,.2,1)',
-        transform: hover ? 'translateY(-6px) rotate(-0.3deg)' : 'none',
+        transition: 'all 0.3s ease',
+        transform: hover ? 'translateY(-8px)' : 'none',
+        boxShadow: hover ? '0 10px 30px rgba(0,0,0,0.5)' : 'none',
       }}
     >
-      {/* תווית "פתק" באלכסון - חתימת עיצוב */}
-      {isHot && (
-        <div style={{
-          position: 'absolute', top: -10, right: -8, zIndex: 4,
-          background: '#ffd23f', color: '#1a1300',
-          fontSize: 11, fontWeight: 800, padding: '4px 10px',
-          borderRadius: '6px 6px 6px 2px',
-          transform: 'rotate(4deg)',
-          boxShadow: '0 2px 0 rgba(0,0,0,0.25)',
-        }}>🔥 להיט</div>
-      )}
-
-      {/* כפתור שמירה */}
       <button onClick={toggleWishlist} aria-label="שמור למועדפים"
         style={{
           position: 'absolute', top: 10, left: 10, zIndex: 3,
-          background: 'rgba(12,12,14,0.7)', backdropFilter: 'blur(4px)',
-          border: 'none', borderRadius: '50%', width: 34, height: 34,
+          background: 'rgba(12,12,14,0.6)', backdropFilter: 'blur(6px)',
+          border: '1px solid rgba(255,255,255,0.1)', borderRadius: '50%', width: 34, height: 34,
           cursor: 'pointer', fontSize: 16, display: 'flex',
           alignItems: 'center', justifyContent: 'center',
         }}>
         {saved ? '❤️' : '🤍'}
       </button>
 
-      {/* תמונה */}
       <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer sponsored"
-        style={{ display: 'block', width: '100%', aspectRatio: '1/1', background: '#0c0c0e', overflow: 'hidden', borderRadius: '18px 18px 0 0' }}>
+        style={{ display: 'block', width: '100%', aspectRatio: '1/1', background: '#0c0c0e', overflow: 'hidden' }}>
         {!imgErr && product.image
           ? <img src={product.image} alt={product.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s', transform: hover ? 'scale(1.06)' : 'scale(1)' }}
@@ -87,7 +76,6 @@ export default function ProductCard({ product, featured=false }) {
         }
       </a>
 
-      {/* תוכן */}
       <div style={{ padding: '14px 16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <p style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: '#f4f4f5', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 42 }}>
           {product.title}
@@ -99,7 +87,7 @@ export default function ProductCard({ product, featured=false }) {
               <span key={i} style={{ fontSize: 13, color: i <= stars ? '#ffd23f' : '#3a3a40' }}>★</span>
             ))}
           </div>
-          <span style={{ fontSize: 11.5, color: '#7a7a82', fontWeight: 600 }}>
+          <span style={{ fontSize: 11.5, color: '#9a9aa2', fontWeight: 600 }}>
             {orders >= 1000 ? `${Math.round(orders/1000*10)/10}K` : orders} הזמנות
           </span>
         </div>
@@ -107,19 +95,21 @@ export default function ProductCard({ product, featured=false }) {
         <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer sponsored"
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            background: '#ff3b6b', color: '#1a0008', fontSize: 14, fontWeight: 800,
-            padding: '12px 0', borderRadius: 12, transition: 'background 0.2s, transform 0.15s',
+            background: 'rgba(255,59,107,0.9)', backdropFilter: 'blur(8px)',
+            color: '#fff', fontSize: 14, fontWeight: 800,
+            padding: '12px 0', borderRadius: 12, transition: 'all 0.2s',
+            border: '1px solid rgba(255,255,255,0.15)',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#ff5980'; e.currentTarget.style.transform = 'scale(1.02)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = '#ff3b6b'; e.currentTarget.style.transform = 'none' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,89,128,0.95)'; e.currentTarget.style.transform = 'scale(1.02)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,59,107,0.9)'; e.currentTarget.style.transform = 'none' }}
         >
           לרכישה ←
         </a>
         <button onClick={shareWA}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: 'transparent', color: '#25d366', fontSize: 12.5, fontWeight: 700,
-            padding: '8px 0', borderRadius: 10, border: '1px solid #25d36640', cursor: 'pointer',
+            background: 'rgba(37,211,102,0.08)', color: '#25d366', fontSize: 12.5, fontWeight: 700,
+            padding: '8px 0', borderRadius: 10, border: '1px solid rgba(37,211,102,0.25)', cursor: 'pointer',
             width: '100%', fontFamily: 'Heebo,sans-serif',
           }}>
           שתף עם חבר 📲
